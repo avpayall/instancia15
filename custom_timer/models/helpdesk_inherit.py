@@ -18,6 +18,7 @@ class TicketCustomTimer(models.Model):
     clasificacion_ticket = fields.Many2one('clasificacion.ticket', string='Categoria', index=True)
     subclasificacion_ticket = fields.Many2one('subclasificacion.ticket', string='Sub-Categoria', index=True)
     contar = fields.Float("MeasureCuenta", compute='_calculate_percentage', compute_sudo=True, store=True)
+    test = fields.Char(string="prueba", store=True)
 
     team_timer = fields.Float(string='Team Timer')
     user_timer = fields.Float(string='User Timer')
@@ -25,12 +26,18 @@ class TicketCustomTimer(models.Model):
 
     progress = fields.Float(string='Progress')
     prueba = fields.Integer(string='Progress', default=5)
-    tiempo_progress = fields.Float(string='T. Nuevo a Progreso')
-    tiempo_completado = fields.Float(string='T. en Completarse')
-    tiempo_anulado = fields.Float(string='T. en ser Anulado')
+    tiempo_progress = fields.Float(string='T. Nuevo a Progreso', store=True)
+    tiempo_completado = fields.Float(string='T. en Completarse', store=True)
+    tiempo_anulado = fields.Float(string='T. en ser Anulado', store=True)
 
     # Auxiliary Variables
     responsible = []
+
+    @api.onchange("partner_id")
+    def _test(self):
+        for record in self:
+            record.test = "hola mundo"
+            print("hola mundo")
 
     @api.onchange('team_id', 'user_id')
     def team_and_user_counter(self):
@@ -104,23 +111,21 @@ class TicketCustomTimer(models.Model):
 
     @api.onchange("stage_id")
     def stoppingStage(self):
-        for record in self:
+        if self.stage_id.id == 2:
+            self.progress = time.time()
+            elapsed_time_progress = time.time() - self.start
+            self.tiempo_progress = elapsed_time_progress
+            print(self.tiempo_progress)
 
-            if record.stage_id.id == 2:
-                record.progress = time.time()
-                elapsed_time_progress = time.time() - record.start
-                record.tiempo_progress = elapsed_time_progress
-                print(record.tiempo_progress)
+        if self.stage_id.id == 3:
+            elapsed_time_completado = time.time() - self.progress
+            self.tiempo_completado = elapsed_time_completado
+            print(self.tiempo_completado)
 
-            if record.stage_id.id == 3:
-                elapsed_time_completado = time.time() - record.progress
-                record.tiempo_completado = elapsed_time_completado
-                print(record.tiempo_completado)
-
-            if record.stage_id.id == 4:
-                elapsed_time_anulado = time.time() - record.progress
-                record.tiempo_anulado = elapsed_time_anulado
-                print(record.tiempo_anulado)
+        if self.stage_id.id == 4:
+            elapsed_time_anulado = time.time() - self.progress
+            self.tiempo_anulado = elapsed_time_anulado
+            print(self.tiempo_anulado)
 
     @api.model
     def create(self, vals):

@@ -9,6 +9,10 @@
                 <xpath expr="//field[@name='tag_ids']" position="replace">
                     <field name="tag_ids" invisible="1"/>
                     <field name="canal_type"/>
+                    <field name="test" invisible="1"/>
+                    <field name="tiempo_progress" invisible="1"/>
+                    <field name="tiempo_completado" invisible="1"/>
+                    <field name="tiempo_anulado" invisible="1"/>
                 </xpath>
                 <xpath expr="//field[@name='email_cc']" position="after">
                     <field name="alias_ticket" placeholder="Alias"/>
